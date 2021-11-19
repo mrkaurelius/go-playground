@@ -25,35 +25,37 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
 )
 
-func addressFromStringSlice(addresses []string) []common.Address {
-	var etherAddresses []common.Address
+type CliqueConfig struct {
+	ChainID           int
+	SignerAccounts    []string
+	PrefondedAccounts []string
+	Period            int
+	Epoch             int
+}
 
-	for k, v := range addresses {
-		fmt.Println(k, v)
-		// etherAddresses[k].
+// TODO check CliqueConfig elements if exists
+// TODO Other network parameters could be added
+func (cc CliqueConfig) generateGenesis() []byte {
+	// create slices
+
+	var signers []common.Address
+	var prefondeds []common.Address
+
+	// OPT slicelarin boyu onceden hesaplanabilir
+	for i, _ := range cc.SignerAccounts {
+		signers = append(signers, common.HexToAddress(cc.SignerAccounts[i]))
 	}
 
-	return etherAddresses
-}
+	for i, _ := range cc.PrefondedAccounts {
+		prefondeds = append(prefondeds, common.HexToAddress(cc.PrefondedAccounts[i]))
+	}
 
-func generateAccount() common.Address {
-	key, _ := crypto.GenerateKey()
-	address := crypto.PubkeyToAddress(key.PublicKey)
-	// privateKey := hex.EncodeToString(key.D.Bytes())
-	return address
-}
+	fmt.Println(signers)
+	fmt.Println(prefondeds)
 
-// TODO
-func generateAddressFromString() common.Address {
-	var address common.Address
-	return address
-}
-
-func generateGenesis(signers []common.Address) {
 	genesis := &core.Genesis{
 		Timestamp:  uint64(time.Now().Unix()),
 		GasLimit:   4700000,
@@ -90,30 +92,52 @@ func generateGenesis(signers []common.Address) {
 		}
 	}
 	genesis.ExtraData = make([]byte, 32+len(signers)*common.AddressLength+65)
+
+	// Add signers
 	for i, signer := range signers {
 		copy(genesis.ExtraData[32+i*common.AddressLength:], signer[:])
 	}
-	fmt.Println(signers)
 
-	// TODO burada kaldim
-	// https://github.com/ethereum/go-ethereum/blob/16341e05636fd088aa04a27fca6dc5cda5dbab8f/cmd/puppeth/wizard_genesis.go#L79
+	// Prefonded addresses
+	for _, profunded := range prefondeds {
+		// Read the address of the account to fund
+		genesis.Alloc[profunded] = core.GenesisAccount{
+			Balance: new(big.Int).Lsh(big.NewInt(1), 256-7), // 2^256 / 128 (allow many pre-funds without balance overflows)
+		}
+	}
 
-	// fmt.Println(genesis)
+	genesis.Config.ChainID = new(big.Int).SetUint64(uint64(cc.ChainID))
+
 	jsonStr, _ := json.MarshalIndent(genesis, "", "  ")
-	fmt.Println(string(jsonStr))
+	return jsonStr
+}
 
+// TODO
+func addressHexStringToAddress(adressHex string) common.Address {
+	recAddress := common.HexToAddress(adressHex)
+	return recAddress
 }
 
 func main() {
-	acc1 := generateAccount()
-	acc2 := generateAccount()
+	// key, _ := crypto.GenerateKey()
+	// address := crypto.PubkeyToAddress(key.PublicKey)
+	// addressString := address.Hex()
 
-	signerAddresses := []common.Address{acc1, acc2}
-	fmt.Println(signerAddresses)
+	// recAddr := addressHexStringToAddress(addressString)
+	// if address == recAddr {
+	// 	fmt.Println("Address recovered !")
+	// }
 
-	generateGenesis(signerAddresses)
+	acc1 := "0x714D9c3B5e9C479059B89a70aAea4A3173e4597F"
+	acc2 := "0x9Ee6056ca96243D54D0c9c07726F804C6179610D"
 
-	// TODO generate address struct from slice
-	// var signers []common.Address = addressFromStringSlice(addresses)
-	// fmt.Println(signers)
+	chaindId := 29
+	signers := []string{acc1, acc2}
+	prefondeds := []string{acc1, acc2}
+	epoch := 3000
+	period := 15
+	cliqueConfig := CliqueConfig{chaindId, signers, prefondeds, period, epoch}
+
+	genesis := cliqueConfig.generateGenesis()
+	fmt.Println(string(genesis))
 }

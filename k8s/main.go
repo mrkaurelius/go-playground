@@ -34,6 +34,10 @@ func createClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
+// Konteynerleri configure etmede bircok yontem olabilir
+// 1. config map kullanarak
+// container'e direkt env gecirerek
+
 func main() {
 	clientset := createClientSet()
 	deploymentClient := kube.CreateDeploymentClient(clientset)

@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p /root/.ethereum/bulutzincir/geth/
+mkdir -p /root/.ethereum/bulutzincir/keystore/
+
+echo "Adding genesis file from env $GENESIS"
+echo -n $GENESIS > /root/.ethereum/bulutzincir/genesis.json
+
+echo "Initing bulutzincir genesis"
+geth --datadir /root/.ethereum/bulutzincir --networkid ${NET_ID} init /root/.ethereum/bulutzincir/genesis.json
+
+echo "Adding keyfile from env $KEYFILE"
+echo -n $KEYFILE > /root/.ethereum/bulutzincir/keystore/0
+
+echo "Adding password file from env $PW"
+echo -n $PW > /root/.ethereum/bulutzincir/password.txt
+
+echo "Listing accounts"
+geth account list --datadir /root/.ethereum/bulutzincir
+
+echo "Running geth"
+geth --syncmode full \
+--datadir /root/.ethereum/bulutzincir \
+--networkid ${NET_ID} \
+--http.addr "0.0.0.0" \
+--http --http.api "eth,web3,net,admin,miner,clique" \
+--http.corsdomain "*" --http.vhosts "*" \
+--unlock ${ACCOUNT} \
+--password /root/.ethereum/bulutzincir/password.txt \
+--allow-insecure-unlock \
+--miner.gaslimit 9000000 \
+--mine --miner.etherbase ${ACCOUNT} \
+--bootnodes "" \

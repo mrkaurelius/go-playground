@@ -7,11 +7,11 @@ import (
 )
 
 func GenerateNginxContainer(name string, envMap map[string]string) []apiv1.Container {
-	sliceList := make([]apiv1.EnvVar, 0)
+	env := make([]apiv1.EnvVar, 0)
 
 	for k, v := range envMap {
 		fmt.Println(k, v)
-		sliceList = append(sliceList, apiv1.EnvVar{Name: k, Value: v})
+		env = append(env, apiv1.EnvVar{Name: k, Value: v})
 	}
 
 	containers := []apiv1.Container{
@@ -25,7 +25,7 @@ func GenerateNginxContainer(name string, envMap map[string]string) []apiv1.Conta
 					ContainerPort: 80,
 				},
 			},
-			Env: sliceList,
+			Env: env,
 		},
 	}
 

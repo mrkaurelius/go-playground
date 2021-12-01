@@ -1,0 +1,26 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bulutzincir-geth
+  labels:
+    app: basic-geth-project-1
+spec:
+  replicas: 1
+  selector: # The .spec.selector field defines how the Deployment finds which Pods to manage
+    matchLabels:
+      app: basic-geth-1
+  template: # The template field contains the following sub-fields:
+    metadata:
+      labels: #  Pods are labeled app: nginxusing the .metadata.labels field
+        app: basic-geth-1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+# spec.selector.matchLabels.app == spec.template.labels.app olmali !!! 

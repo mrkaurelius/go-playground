@@ -1,0 +1,22 @@
+
+# ya yeni pathlar eklenmeli 
+# yada yeni ingressler olusturulmali
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bulutzincir-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    # /etc/hosts da minikube ip bulutzincir.info olacak sekilde olmali
+    - host: bulutzincir.info
+      http:
+        paths:
+          - path: / 
+            pathType: Prefix
+            backend:
+              service:
+                name: bulutzincir-geth-1-service
+                port:
+                  number: 8545

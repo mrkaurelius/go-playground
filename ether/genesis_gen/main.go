@@ -128,12 +128,12 @@ func main() {
 	// 	fmt.Println("Address recovered !")
 	// }
 
-	acc1 := "0x714D9c3B5e9C479059B89a70aAea4A3173e4597F"
-	acc2 := "0x9Ee6056ca96243D54D0c9c07726F804C6179610D"
+	acc1 := "0xf8da45375Ae92d75970a7a589d3B2C5307f78941"
+	// acc2 := "0x9Ee6056ca96243D54D0c9c07726F804C6179610D"
 
 	chaindId := 29
-	signers := []string{acc1, acc2}
-	prefondeds := []string{acc1, acc2}
+	signers := []string{acc1}
+	prefondeds := []string{acc1}
 	epoch := 3000
 	period := 15
 	cliqueConfig := CliqueConfig{chaindId, signers, prefondeds, period, epoch}

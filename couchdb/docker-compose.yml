@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  couch:
+    image: apache/couchdb:3.2.0
+    ports:
+      - 5984:5984
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+
+# docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password apache/couchdb:3.2

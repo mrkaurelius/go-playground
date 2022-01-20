@@ -2,18 +2,17 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"path/filepath"
 
+	"example.com/m/v2/k8s-examples/simple"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-
-	"example.com/m/v2/k8s-examples/kube"
 )
 
 func createClientSet() *kubernetes.Clientset {
 	var kubeconfig *string
+	// kubeconfig = "/home/mrk/.kube/config"
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
@@ -22,7 +21,6 @@ func createClientSet() *kubernetes.Clientset {
 	flag.Parse()
 
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	fmt.Println(config)
 	if err != nil {
 		panic(err)
 	}
@@ -34,21 +32,19 @@ func createClientSet() *kubernetes.Clientset {
 	return clientset
 }
 
-// Konteynerleri configure etmede bircok yontem olabilir
-// 1. config map kullanarak
-// container'e direkt env gecirerek
-
 func main() {
 	clientset := createClientSet()
-	deploymentClient := kube.CreateDeploymentClient(clientset)
 
-	envVars := make(map[string]string)
-	envVars["deneme"] = "biriki"
-	envVars["asdf"] = "ucdort"
+	ingressClient := simple.CreateIngressClient(clientset)
+	ingress := simple.BuildIngress()
+	simple.DeployIngress(ingress, ingressClient)
 
-	nginxContainer := kube.GenerateNginxContainer("deneme1", envVars)
-	deploymentObject := kube.GenerateDeploymentObject("ahmetmehmet12345", nginxContainer)
+	// TODO burada kaldim
+	serviceClient := simple.CreateServiceClient(clientset)
+	service := simple.GenerateService()
+	simple.DeployService(serviceClient, service)
 
-	fmt.Println(deploymentClient, deploymentObject)
-	kube.CreateDeployment(deploymentClient, deploymentObject)
+	podClient := simple.CreatePodClient(clientset)
+	pod := simple.BuildPod()
+	simple.DeployPod(podClient, pod)
 }

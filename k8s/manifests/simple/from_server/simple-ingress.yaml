@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/rewrite-target":"/$1"},"name":"simple-nginx-ingress","namespace":"default"},"spec":{"rules":[{"host":"local.mrk1debian","http":{"paths":[{"backend":{"service":{"name":"simple-nginx-service","port":{"number":80}}},"path":"/test","pathType":"Prefix"}]}}]}}
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  creationTimestamp: "2022-01-18T09:06:41Z"
+  generation: 1
+  name: simple-nginx-ingress
+  namespace: default
+  resourceVersion: "22824"
+  selfLink: /apis/networking.k8s.io/v1/namespaces/default/ingresses/simple-nginx-ingress
+  uid: 4302c467-67a4-407f-acbb-620e16561fee
+spec:
+  ingressClassName: public
+  rules:
+  - host: local.mrk1debian
+    http:
+      paths:
+      - backend:
+          service:
+            name: simple-nginx-service
+            port:
+              number: 80
+        path: /test
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 127.0.0.1

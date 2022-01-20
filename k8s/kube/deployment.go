@@ -14,6 +14,7 @@ import (
 )
 
 func CreateDeploymentClient(clientset *kubernetes.Clientset) v1.DeploymentInterface {
+	// clientset.NetworkingV1().Ingresses() // bele
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 	return deploymentsClient
 }
